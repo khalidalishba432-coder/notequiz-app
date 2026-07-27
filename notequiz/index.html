@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NoteQuiz — Turn your notes into a quiz</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #171a21;
+    --accent: #6c5ce7;
+    --accent2: #00cec9;
+    --text: #eaeaea;
+    --muted: #9aa0a6;
+    --good: #00b894;
+    --bad: #d63031;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(160deg, #0f1115, #1a1d26);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 { font-size: 2rem; margin-bottom: 4px; }
+  header h1 span { color: var(--accent2); }
+  header p { color: var(--muted); margin: 0; }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    background: #0f1115;
+    color: var(--text);
+    border: 1px solid #2a2e38;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 0.95rem;
+    resize: vertical;
+  }
+  button {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: white;
+    border: none;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error { color: var(--bad); margin-top: 10px; font-size: 0.9rem; }
+  h2 { font-size: 1.2rem; margin-top: 0; }
+  ul.summary { padding-left: 20px; line-height: 1.6; }
+  .q { margin-bottom: 18px; }
+  .q p.question { font-weight: 600; margin-bottom: 8px; }
+  .opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #0f1115;
+    border: 1px solid #2a2e38;
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 0.92rem;
+  }
+  .opt.correct { border-color: var(--good); background: rgba(0,184,148,0.15); }
+  .opt.wrong { border-color: var(--bad); background: rgba(214,48,49,0.15); }
+  .opt:disabled { cursor: default; }
+  .score { text-align: center; font-size: 1.05rem; margin-top: 6px; color: var(--accent2); }
+  .loading { text-align: center; color: var(--muted); padding: 20px 0; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Note<span>Quiz</span></h1>
+    <p>Paste your notes. Get a summary + a self-test quiz in seconds.</p>
+  </header>
+
+  <div class="card">
+    <textarea id="notes" placeholder="Paste your class notes here (the messier the better)..."></textarea>
+    <button id="genBtn">Generate Summary & Quiz</button>
+    <div id="err" class="error"></div>
+  </div>
+
+  <div id="loading" class="loading" style="display:none;">Thinking... generating your summary and quiz...</div>
+
+  <div id="results"></div>
+
+  <footer>Built for a class project · Powered by Groq (Llama 3.3)</footer>
+</div>
+
+<script>
+const genBtn = document.getElementById('genBtn');
+const notesEl = document.getElementById('notes');
+const errEl = document.getElementById('err');
+const loadingEl = document.getElementById('loading');
+const resultsEl = document.getElementById('results');
+
+let quizData = null;
+
+genBtn.addEventListener('click', async () => {
+  errEl.textContent = '';
+  resultsEl.innerHTML = '';
+  const notes = notesEl.value.trim();
+
+  if (notes.length < 20) {
+    errEl.textContent = 'Please paste a bit more text (at least a few sentences).';
+    return;
+  }
+
+  genBtn.disabled = true;
+  loadingEl.style.display = 'block';
+
+  try {
+    const res = await fetch('/api/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Something went wrong.';
+      return;
+    }
+
+    quizData = data;
+    renderResults(data);
+  } catch (e) {
+    errEl.textContent = 'Network error: ' + e.message;
+  } finally {
+    genBtn.disabled = false;
+    loadingEl.style.display = 'none';
+  }
+});
+
+function renderResults(data) {
+  let html = '<div class="card"><h2>📌 Summary</h2><ul class="summary">';
+  data.summary.forEach(point => {
+    html += `<li>${escapeHtml(point)}</li>`;
+  });
+  html += '</ul></div>';
+
+  html += '<div class="card"><h2>📝 Self-Test Quiz</h2>';
+  data.quiz.forEach((q, qi) => {
+    html += `<div class="q" data-qindex="${qi}">
+      <p class="question">${qi + 1}. ${escapeHtml(q.question)}</p>`;
+    q.options.forEach((opt, oi) => {
+      html += `<button class="opt" data-qi="${qi}" data-oi="${oi}">${escapeHtml(opt)}</button>`;
+    });
+    html += `</div>`;
+  });
+  html += '<div id="scoreBox" class="score"></div></div>';
+
+  resultsEl.innerHTML = html;
+
+  document.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', handleAnswer);
+  });
+}
+
+let answered = 0;
+let correctCount = 0;
+
+function handleAnswer(e) {
+  const btn = e.target;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+  const q = quizData.quiz[qi];
+
+  const qDiv = document.querySelector(`.q[data-qindex="${qi}"]`);
+  const opts = qDiv.querySelectorAll('.opt');
+  opts.forEach(o => o.disabled = true);
+
+  if (oi === q.correctIndex) {
+    btn.classList.add('correct');
+    correctCount++;
+  } else {
+    btn.classList.add('wrong');
+    opts[q.correctIndex].classList.add('correct');
+  }
+
+  answered++;
+  if (answered === quizData.quiz.length) {
+    document.getElementById('scoreBox').textContent =
+      `You scored ${correctCount} / ${quizData.quiz.length} 🎉`;
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
