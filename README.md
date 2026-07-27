@@ -6,7 +6,7 @@
 Students cramming before an exam often have pages of raw, disorganized notes and no time to turn them into study material. Making your own practice questions is one of the best ways to check if you actually understand something — but it's slow to do by hand. NoteQuiz does it in seconds, for any student, on any subject.
 
 ### 🔗 Live app
-https://notequiz-app-git-main-khalidalishba432-coders-projects.vercel.app/
+notequiz-app.vercel.app
 ### Features
 - Paste any raw class notes (any subject, any length)
 - Get an AI-generated 5–8 bullet point summary of the key concepts
