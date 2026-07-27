@@ -35,11 +35,11 @@ The model's JSON response is parsed on the server and rendered into the interact
 - **Version control:** GitHub
 
 ### Screenshots
-1. The empty app with notes pasted in
+1. The empty app with notes pasted in ss2.png
    "C:\Users\USER\OneDrive\图片\ss2.png"
-2. The generated summary + quiz
+2. The generated summary + quiz ss3.png
    "C:\Users\USER\OneDrive\图片\ss3.png"
-3. A finished quiz showing the score / right-wrong feedback
+3. A finished quiz showing the score / right-wrong feedback  ss1.png
    "C:\Users\USER\OneDrive\图片\ss1.png"
 
 ```
