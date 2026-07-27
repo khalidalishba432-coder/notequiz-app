@@ -6,8 +6,7 @@
 Students cramming before an exam often have pages of raw, disorganized notes and no time to turn them into study material. Making your own practice questions is one of the best ways to check if you actually understand something — but it's slow to do by hand. NoteQuiz does it in seconds, for any student, on any subject.
 
 ### 🔗 Live app
-**[https://YOUR-VERCEL-URL.vercel.app](https://YOUR-VERCEL-URL.vercel.app)** ← replace with your real deployed URL
-
+https://notequiz-app-git-main-khalidalishba432-coders-projects.vercel.app/
 ### Features
 - Paste any raw class notes (any subject, any length)
 - Get an AI-generated 5–8 bullet point summary of the key concepts
@@ -36,18 +35,14 @@ The model's JSON response is parsed on the server and rendered into the interact
 - **Version control:** GitHub
 
 ### Screenshots
-_Add at least 3 screenshots here, e.g.:_
-
 1. The empty app with notes pasted in
+   ss2.png
 2. The generated summary + quiz
+   ss3.png
 3. A finished quiz showing the score / right-wrong feedback
+   ss1.png
 
 ```
-![Home screen](screenshots/1-home.png)
-![Summary and quiz](screenshots/2-quiz.png)
-![Score result](screenshots/3-score.png)
-```
-
 ### How to run this project locally
 1. Clone the repo:
    ```
