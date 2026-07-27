@@ -36,17 +36,17 @@ The model's JSON response is parsed on the server and rendered into the interact
 
 ### Screenshots
 1. The empty app with notes pasted in
-   ss2.png
+   "C:\Users\USER\OneDrive\图片\ss2.png"
 2. The generated summary + quiz
-   ss3.png
+   "C:\Users\USER\OneDrive\图片\ss3.png"
 3. A finished quiz showing the score / right-wrong feedback
-   ss1.png
+   "C:\Users\USER\OneDrive\图片\ss1.png"
 
 ```
 ### How to run this project locally
 1. Clone the repo:
    ```
-   git clone https://github.com/YOUR-USERNAME/notequiz.git
+   C:\Users\USER\OneDrive\Desktop\ai-career-navigator\ai-career-navigator\notequiz-app
    cd notequiz
    ```
 2. Install the [Vercel CLI](https://vercel.com/docs/cli): `npm i -g vercel`
